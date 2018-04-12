@@ -7,21 +7,15 @@ class Users_Model extends Model{
     }
 
     private $_objType = "users";
-    private $_table = "users u LEFT JOIN users_roles r ON u.user_role_id=r.role_id";
+    private $_table = "users u LEFT JOIN users_role r ON u.user_role_id=r.role_id";
     private $_field = "
-          user_id
-        , user_name
+          u.iduser as id
+        , username
+        , firstname
+        , lastname
         , user_email
-        , user_login
-        , user_lang
-        , user_is_owner
-
-        , user_mode
-        , user_lastvisit
-        , user_enabled
-
+        
         , role_id
-        , role_name
     ";
     private $_prefixField = "user_";
 
@@ -61,7 +55,7 @@ class Users_Model extends Model{
 
     /* -- find -- */
     public function findById($id){
-        $sth = $this->db->prepare("SELECT {$this->_field} FROM {$this->_table} WHERE user_id=:id LIMIT 1");
+        $sth = $this->db->prepare("SELECT {$this->_field} FROM {$this->_table} WHERE `iduser`=:id LIMIT 1");
         $sth->execute( array( ':id' => $id  ) );
         return $sth->rowCount()==1 ? $this->convert( $sth->fetch( PDO::FETCH_ASSOC ) ): array();
     }
@@ -123,6 +117,7 @@ class Users_Model extends Model{
 
         $data = $this->__cutPrefixField($this->_prefixField, $data);
         $data['access'] = $this->setAccess( $data['role_id'] );
+        $data['name'] = ucfirst($data['username']);
 
         return $data;
     }
@@ -139,7 +134,7 @@ class Users_Model extends Model{
     /* -- Login -- */
     public function login($user, $pess){
 
-        $sth = $this->db->prepare("SELECT user_id as id FROM {$this->_objType} WHERE (user_login=:login AND user_pass=:pass) OR (user_email=:login AND user_pass=:pass)");
+        $sth = $this->db->prepare("SELECT iduser as id FROM {$this->_objType} WHERE (user_login=:login AND user_pass=:pass) OR (user_email=:login AND user_pass=:pass)");
 
         $sth->execute( array(
             ':login' => $user,

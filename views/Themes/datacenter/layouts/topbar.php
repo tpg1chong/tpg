@@ -106,7 +106,7 @@ echo '<div id="header-primary" class="topbar">'.
 			echo '<ul id="pageNav" class="clearfix lfloat js-global-actions">'.$pageNav.'</ul>';
 		echo '</div>';
 
-		echo '<ul class="clearfix rfloat nav mrl">'.$pageNavR.'</ul>';
+		echo '<ul class="clearfix rfloat nav">'.$pageNavR.'</ul>';
 	echo '</div>';
 		
 echo '</div></div>';

@@ -8,7 +8,7 @@ class Property_Controller extends Controller {
 
     public function index() {
 
-        $this->error();
+        $this->view->render('property/lists/display');
     }
 
     /* -- Property Action -- */
