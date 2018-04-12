@@ -11,8 +11,8 @@ d88' `8b   88bP"Y88b   888P"Y88b  "888P"Y88b   888' `88b
 */html,body{min-height: 100vh}
 body{background-color: #f2f2f2;}
 a{color:#2196f3;text-decoration:none}
-.btn{border-radius:3px;}
-.login-container-wrapper{padding:45px;background-color:#fff;border-radius:2px;box-shadow:0 1px 1.5px 0 rgba(0,0,0,0.12);width:392px;margin-left:auto;margin-right:auto;position:relative;z-index:300;    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 1px 6px rgba(0, 0, 0, 0.12)}
+.btn{border-radius:30px;padding-left: 15px;padding-right: 15px}
+.login-container-wrapper{padding:45px;background-color:#fff;border-radius:12px;box-shadow:0 1px 1.5px 0 rgba(0,0,0,0.12);width:392px;margin-left:auto;margin-right:auto;position:relative;z-index:300;    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 1px 6px rgba(0, 0, 0, 0.12)}
 .login-header-bar{text-align:center;color:#fff;margin-bottom: 20px}
 .login-logo .text h2{text-shadow:0 1px 1px rgba(0,0,0,.2);-webkit-transition-duration:1s;transition-duration:1s;-webkit-transition-timing-function:ease-in-put;transition-timing-function:ease-in-put;font-weight:200;letter-spacing:-1px;position:relative;text-shadow:2px 2px rgba(0,0,0,0.15);display:inline-block}
 .login-logo .text a{font-size:13px;line-height:1.28;position:absolute;top:0;margin-top:-15px;right:0;color:#000;font-style:italic;text-decoration:none}

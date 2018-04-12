@@ -4,37 +4,30 @@ class Controller {
 
     public $format = "html";
     public $pathName = "";
-    function __construct() {
-        
-        $this->fn = new _function();
-        $this->format = $this->get_format_json() ? "json":"html";
-        $this->lang = new Langs();
 
+
+    function __construct() {
+        $this->fn = new Fn();
+        $this->format =  $this->_httprequestFormat();
+        $this->lang = new Langs();
+        $this->lang->set( 'en' );
+        
         // View
         $this->view = new View();
         $this->view->format = $this->format;
-
-        $this->view->setPage('locale', $this->lang->getCode() );
     }
  
-    private function get_format_json() {
-        $_q = false;
+    private function _httprequestFormat() {
+        $_q = 'html';
         if( isset($_SERVER['HTTP_X_REQUESTED_WITH']) ){
             if( strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest' ){
-                $_q = true;
+                $_q = 'json';
             }
         }
 
         return $_q;
     }
     
-    public function verifyWWW() {
-
-        if (strpos($_SERVER['SERVER_NAME'],'www') !== false) {
-            header("Location:". URL. ltrim($_SERVER['REQUEST_URI'], '/'));
-        }
-    }
-
     /**
      * 
      * @param string $name Name of the model
@@ -43,7 +36,6 @@ class Controller {
     public function loadModel($name, $modelPath = 'models/') {
 
         $path = $modelPath . $name.'_model.php';
-        $this->pathName = $name;
         
         if (file_exists($path)) {
             require $modelPath .$name.'_model.php';
@@ -54,17 +46,239 @@ class Controller {
         else{
             $this->model = new Model();
         }
-        
-        $this->system = $this->model->query('system')->get();
-        if( !empty($this->system) ){
-            $this->setSystem();
-            $this->view->setData('system', $this->system);
+
+        $this->init( $name );
+        $this->handleLogin();
+
+        $this->setDataDefault();
+    }
+
+    // return FORM Error
+    protected function _getError($err) {
+        $err = explode(',', rtrim($err, ','));
+
+        $error = array();
+        foreach ($err as $k) {
+            $str = explode('=>', $k);
+            $error[$str[0]] = $str[1];
         }
 
-        $this->handleLogin();
-        
+        return $error;        
     }
-    public function setPagePermit($value='') {
+
+    public $me = null;
+    public function handleLogin(){
+        Session::init();
+
+        $loggedOn = $this->getPage('loggedOn');
+        if ( Cookie::get( COOKIE_KEY_USER ) ) {
+            $me = $this->model->query('users')->findById( Cookie::get( COOKIE_KEY_USER ) );
+        }
+
+        if( !empty($me) ){
+            $this->me =  $me;
+
+            if( !empty($this->me['lang']) ){
+                Session::init();
+                Session::set('lang', $this->me['lang']);
+                
+                $this->lang->set( $this->me['lang'] );
+            }
+
+            
+            $this->view->setData('me', $this->me);
+            Cookie::set( COOKIE_KEY_USER, $this->me['id'], time() + (3600*24));
+
+            // 
+            /* -- authorization -- */
+            $this->pageOptions['auth'] = $this->model->query('system')->auth( !empty($this->me['access']) ? $this->me['access']: array() );
+            $this->view->setPage('auth', $this->pageOptions['auth']);
+        }
+        else if( !empty( $loggedOn ) ) {
+            $this->login();
+        }
+    }
+
+
+    // Page Error
+    public function error(){
+        if( !$this->model ){
+            $this->loadModel('error');
+        }
+
+        if( $this->format=='json' ){
+
+            echo json_encode(array(
+                'error' => 404,
+                'message' => 'Page not found'
+            ));
+        }
+        else{
+            $this->view->setPage('title', $this->lang->getCode()=='th'?'ไม่พบเพจ': 'Page not found');
+            $this->view->elem('body')->addClass('page-errors');
+            $this->view->render( 'error' );
+        }
+
+        exit;
+    }
+
+    // Page Login
+    public function login() {
+        Session::init();
+
+        $render = $this->getPage('render');
+        $render = in_array($render, array('forgot_password') )? $render: '';
+
+        $attempt = Session::get('login_attempt');
+        if( isset($attempt) && $attempt>=2 ){
+            $this->view->setData('captcha', true);
+            $this->view->js('https://www.google.com/recaptcha/api.js', true);
+        }
+        elseif( empty($attempt) ){
+            $attempt = 0;
+            Session::set('login_attempt', $attempt);
+        }
+
+        $login_mode = isset($_REQUEST['login_mode']) ? $_REQUEST['login_mode']: 'default';
+
+        if( empty($_REQUEST['g-recaptcha-response']) && $attempt>2 ){
+            $error['captcha'] = 'คุณป้อนรหัสไม่ถูกต้อง?';
+        }
+        if( !empty($_POST) && empty($error) ){            
+            try {
+                $form = new Form();
+
+                $form   ->post('email')->val('is_empty')
+                        ->post('pass')->val('is_empty');
+
+                $form->submit();
+                $post = $form->fetch();
+
+                $id = $this->model->query('users')->login($post['email'], $post['pass']);
+
+                if( !empty($id) ){
+
+                    Cookie::set( COOKIE_KEY_USER, $id, time() + (3600*24));
+                    Session::set('isPushedLeft', 1);
+
+                    if( isset($attempt) ){
+                       Session::clear('login_attempt');
+                    }
+
+                    $url = !empty($_REQUEST['next'])
+                        ? $_REQUEST['next']
+                        : $_SERVER['REQUEST_URI'];
+
+                    header('Location: '.$url);
+                }
+                else{
+
+                    if(!$this->model->query('users')->is_user($post['email'])){
+                        $error['email'] = 'ชื่อผู้ใช้ไม่ถูกต้อง'; 
+                    }
+                    else{
+                        $error['pass'] = 'รหัสผ่านไม่ถูกต้อง';
+                    }
+                }
+
+                $post['pass'] = "";
+                $this->view->setData('post', $post);
+            } catch (Exception $e) {
+                $error = $this->_getError( $e->getMessage() );
+            }            
+        }
+        if(!empty($error)){
+
+            if( isset($attempt) ){
+                $attempt++;
+                Session::set('login_attempt', $attempt);
+            }
+
+            $this->view->setData('error', $error);
+        }
+
+        $redirect = URL.$this->getPage('theme').'/';
+        $redirect = !empty($render) ? $redirect.$render.'/':'';
+
+        $next = isset($_REQUEST['next']) ? $_REQUEST['next']: '';
+        
+        if( !empty( $next) ){
+            $this->view->setData('next', $next);
+        }
+
+        $this->view->setData('redirect', $redirect);
+        $title = $this->pageOptions['title'];
+        $title = !empty($title)? Translate::Val('Login') . ' - ' . $title: Translate::Val('Login');
+
+        $this->view->setPage('title', $title );
+        $this->view->setPage('theme', 'login');
+
+        $this->view->render( !empty($render) ? $render: 'default' );
+        exit;
+    }
+
+    private $pageOptions = array(
+        'elem' => array(),
+        'data' => array(),
+        'theme_options' => array(),
+    );
+
+    /* -- init --*/
+    public function init($on) {
+
+        // Get Data System
+        $this->pageOptions = array_merge($this->pageOptions, $this->model->query('system')->get() );
+        $this->pageOptions['on'] = $on;
+
+        // print_r($this->pageOptions); die;
+
+        // set Theme
+
+        if( empty($this->pageOptions['theme']) ){
+
+            $this->pageOptions['theme'] = 'datacenter';
+            $this->pageOptions['theme_options'] = array('topbar'=>true);
+            $this->pageOptions['favicon'] = IMAGES.'favicon-v2.png';
+            $this->pageOptions['loggedOn'] = true;
+        }
+
+        $this->view->page = $this->pageOptions;
+        // authorization
+    }
+
+    public function setDataDefault()
+    {
+        $themeName = $this->view->getPage( 'theme' );
+        
+        if( $themeName=='datacenter' ){
+
+            $this->view->setPage('nav', $this->model->query('system')->pageNav());
+        }
+    }
+
+
+
+    public function setPage($key, $val=null) {
+
+        if( is_array($key) ){
+            foreach ($key as $key => $val) {
+                $this->pageOptions[$key] = $val;
+            }
+        }
+        else{
+            $this->pageOptions[$key] = $val;
+        }
+
+        return $this;
+    }
+    public function getPage($key)
+    {
+        return !empty($this->pageOptions[$key]) ? $this->pageOptions[$key]: null;
+    }
+
+
+    // Permit Page
+    public function setPagePermit() {
 
         $permit = $this->model->query('system')->permit( !empty($this->me['access']) ? $this->me['access']:array() );
 
@@ -79,11 +293,39 @@ class Controller {
 
         }
 
+        // print_r($permit); die;
+        
         $this->permit = $permit;
         $this->view->setData('permit', $this->permit);
+
+        /*echo 'options page';
+        print_r($this->pageOptions); die;
+
+        # Check Permit
+        if( !empty($this->pageOptions['data']['permit']) && !empty($this->pageOptions['theme_options']['logged']) ){
+
+            $on = $this->pageOptions['on'];
+            if( empty($on) ) $on = $name;
+
+            if( empty($this->pageOptions['data']['permit'][$on][$this->pageOptions['action']]) ){
+
+                if( $this->format=='json' ){
+                    echo json_encode(array(
+                        'error' => 404,
+                        'message' => 'Page not found'
+                    )); exit;
+                }
+                else{
+                    $this->setPage('title', 'Page not found');
+                    $name = 'error';
+                }
+                
+            }
+        }*/
     }
 
-    public function setSystem(){
+    // set Data Default Page
+    public function setupSystem(){
 
         $url = isset($_GET['url']) ?$_GET['url']:'';
         $title = '';
@@ -129,210 +371,16 @@ class Controller {
 
             $this->view->setPage('description',  $description );
         }  
-	
-		if( empty($this->system['image']) ){
-			$this->view->setPage( 'image', IMAGES.'logo/25x25.png' );
-		}
+    
+        
+        $this->view->setPage('logo', IMAGES.'logo/top-logo.png' );
+        if( empty($this->system['image']) ){
+            $this->view->setPage( 'image', IMAGES.'logo/top-logo.png' );
+        }
 
         if( !empty($this->system['theme']) ){
             $this->view->setPage('theme',  $this->system['theme'] );
         }
     }
 
-    protected function _getError($err) {
-        $err = explode(',', rtrim($err, ','));
-
-        $error = array();
-        foreach ($err as $k) {
-            $str = explode('=>', $k);
-            $error[$str[0]] = $str[1];
-        }
-
-        return $error;        
-    }
-
-    public $me = null;
-    public function handleLogin(){
-
-        if ( Cookie::get( COOKIE_KEY_USER ) ) {
-            $me = $this->model->query('users')->get( Cookie::get( COOKIE_KEY_USER ) );
-        }
-
-        if( !empty($me) ){
-            $this->me =  $me;
-
-            if( !empty($this->me['lang']) ){
-
-                Session::init();
-                Session::set('lang', $this->me['lang']);
-                
-                $this->lang->set( $this->me['lang'] );
-            }
-
-            $this->model->me = $this->me;
-            $this->view->me = $this->me;
-            $this->view->setData('me', $this->me);
-
-            Cookie::set( COOKIE_KEY_USER, $this->me['id'], time() + (3600*24));
-
-            // 
-            $this->setPagePermit();
-            $this->_modify();
-        }else if( $this->pathName != 'auth' ){
-            $this->login();
-        }
-    }
-    public function error(){
-        
-        if( !$this->model ){
-            $this->loadModel('error');
-        }
-
-        $this->view->setPage('title', $this->lang->getCode()=='th'?'ไม่พบเพจ': 'Page not found');
-        $this->view->elem('body')->addClass('page-errors');
-        $this->view->render( 'error' );
-        exit;
-    }
-
-    public function login() {
-
-        Session::init();
-        $attempt = Session::get('login_attempt');
-        if( isset($attempt) && $attempt>=2 ){
-            /*$this->view->setData('captcha', true);
-            $this->view->js('https://www.google.com/recaptcha/api.js', true);*/
-        }
-        elseif( empty($attempt) ){
-            $attempt = 0;
-            Session::set('login_attempt', $attempt);
-        }
-
-        $login_mode = isset($_REQUEST['login_mode']) ? $_REQUEST['login_mode']: 'default';
-
-        if( empty($_REQUEST['g-recaptcha-response']) && $attempt>2 && $login_mode=='default' ){
-            // $error['captcha'] = 'คุณป้อนรหัสไม่ถูกต้อง?';
-        }
-
-        if( !empty($_POST) && empty($error) ){
-            
-            try {
-                $form = new Form();
-
-                $form   ->post('email')->val('is_empty')
-                        ->post('pass')->val('is_empty');
-
-                $form->submit();
-                $post = $form->fetch();
-
-                $id = $this->model->query('users')->login($post['email'], $post['pass']);
-
-                if( !empty($id) ){
-
-                    Cookie::set( COOKIE_KEY_USER, $id, time() + (3600*24));
-                    Session::set('isPushedLeft', 1);
-
-                    if( isset($attempt) ){
-                       Session::clear('login_attempt');
-                    }
-
-                    $url = !empty($_REQUEST['next'])
-                        ? $_REQUEST['next']
-                        : $_SERVER['REQUEST_URI'];
-
-                    header('Location: '.$url);
-                }
-                else{
-
-                    if(!$this->model->query('users')->is_user($post['email'])){
-                        $error['email'] = 'ชื่อผู้ใช้ไม่ถูกต้อง'; 
-                    }
-                    else{
-                        $error['pass'] = 'รหัสผ่านไม่ถูกต้อง';
-                    }
-                }
-
-                $post['pass'] = "";
-                $this->view->setData('post', $post);
-            } catch (Exception $e) {
-                $error = $this->_getError( $e->getMessage() );
-            }
-
-        }
-
-        if(!empty($error)){
-
-            if( isset($attempt) ){
-                $attempt++;
-                Session::set('login_attempt', $attempt);
-            }
-
-            $this->view->setData('error', $error);
-        }
-
-        $redirect = URL;
-        $next = isset($_REQUEST['next']) ? $_REQUEST['next']: '';
-        
-        if( !in_array($this->view->getPage('theme'), array('default', 'crm')) ){
-            $next = URL.$this->view->getPage('theme');
-            $redirect = $next;
-        }
-        
-        if( !empty( $next) ){
-            $this->view->setData('next', $next);
-        }
-
-        $this->view->setPage('title',  $this->system['title'] );
-        $this->view->setData('redirect', $redirect);
-        $this->view->setPage('name', $this->lang->getCode()=='th'?'เข้าสู่ระบบ': 'Login');
-        $this->view->setPage('theme', 'login');
-        $this->view->setPage('theme_options', array(
-            'has_topbar' => false,
-            'has_footer' => false,
-        ));
-
-        /*if( isset($_REQUEST['login_mode']) ){
-            Session::set('login_mode', $_REQUEST['login_mode']);
-        }*/
-
-        $mode = Session::get('login_mode');
-        if( empty($mode) ) $mode = 'default';
-        $this->view->render( $mode );
-        exit;
-    }
-
-    public function _modify() {
-        
-        $options = array(
-            'has_topbar' => false,
-            'has_menu' => false,
-            'has_footer' => false,
-        );
-
-        if( $this->pathName=='printer' ){
-            $this->system['theme'] = 'printer';
-        }
-
-        if( empty($this->system['theme']) ){
-            // $options['has_menu'] = true;
-            $options['has_topbar'] = true;
-            $this->system['theme'] = 'default';
-        }
-
-        
-        $this->view->setPage('image_logo_url', IMAGES.'logo/25x25.png');
-
-        $this->view->setPage('theme', $this->system['theme']);
-        $this->view->setPage('theme_options', $options);  
-    }
-
-
-    public function getCalendarId() {
-        $lang = $this->lang->getCode();
-
-        $calendarId = array();
-        array_push($calendarId, "{$lang}.th#holiday@group.v.calendar.google.com");
-        array_push($calendarId, $this->me['user_email']);
-
-        return $calendarId;
-    }
 }

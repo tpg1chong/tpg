@@ -8,7 +8,7 @@ class Bootstrap {
     private $_controllerPath = 'controllers/'; // Always include trailing slash
     private $_modelPath = 'models/'; // Always include trailing slash
     private $_errorFile = 'error.php';
-    private $_defaultFile = 'index.php';
+    private $_defaultFile = 'index_controller.php';
     private $_itemsPath = array('properties');
     
     /**
@@ -91,7 +91,7 @@ class Bootstrap {
         }
         else{
             require $this->_controllerPath . $this->_defaultFile;
-            $this->_controller = new Index();
+            $this->_controller = new Index_Controller();
             $this->_controller->loadModel('index', $this->_modelPath);
             $this->_controller->index();
         }
@@ -104,13 +104,15 @@ class Bootstrap {
      */
     private function _loadExistingController()
     {
-        $file = $this->_controllerPath . $this->_url[0] . '.php';
-        
+        $file = $this->_controllerPath . $this->_url[0] . '_controller.php';
+
         if (file_exists($file)) {
             require $file;
 
             $page = str_replace('-', '', $this->_url[0]);
-            $this->_controller = new $page;
+            $controller = "{$page}_Controller";
+            
+            $this->_controller = new $controller($this->_url);
             $this->_controller->loadModel($page, $this->_modelPath);
         } else {
 
@@ -124,7 +126,7 @@ class Bootstrap {
     public function _search() {
 
         require $this->_controllerPath . $this->_defaultFile;
-        $this->_controller = new Index();
+        $this->_controller = new Index_Controller();
         $this->_controller->loadModel('index', $this->_modelPath);
         $this->_controller->search( $this->_url );
         exit;
@@ -207,7 +209,7 @@ class Bootstrap {
     private function _error($path=null) {
 
         require $this->_controllerPath . $this->_errorFile;
-        $this->_controller = new Error();
+        $this->_controller = new Error_Controller();
         $this->_controller->index($path);
         exit;
     }

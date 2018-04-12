@@ -64,6 +64,16 @@ class Create_Form
 		$this->_field[$this->_currentField]['label'] = $text;
 		return $this;
 	}
+	public function items($str)
+	{
+		$this->_field[$this->_currentField]['items'] = $str;
+		return $this;
+	}
+	public function checked($str)
+	{
+		$this->_field[$this->_currentField]['checked'] = $str;
+		return $this;
+	}
 
 	public function notify($text){		
 		$this->_field[$this->_currentField]['notify'] = $text;
@@ -106,6 +116,10 @@ class Create_Form
 	}
 	public function note($text){
 		$this->_field[$this->_currentField]['note'] = $text;
+		return $this;
+	}
+	public function hind($text) {
+		$this->_field[$this->_currentField]['hind'] = $text;
 		return $this;
 	}
 
@@ -185,6 +199,7 @@ class Create_Form
 
 		$field_str = ""; $actions = "";
 		foreach ($this->_field as $key=>$value) {
+			$string = '';
 
 			$keyx = explode("_", $key);
 			if( $keyx[0] === '$hr' ){
@@ -235,6 +250,16 @@ class Create_Form
 					? $value['attr']['name']
 					: $value['attr']['id'];
 			}
+
+
+			$id = "";
+			if( isset($value['attr']['id']) ){
+				$id = $value['attr']['id'];
+
+			}else if( isset($value['attr']['name']) ){
+				$id = $value['attr']['name'];
+			}
+
 
 			$fieldId = isset($value['attr']['id'])
 				? ' id="'.$value['attr']['id'].'_fieldset"'
@@ -288,13 +313,72 @@ class Create_Form
 
 				$string = '<textarea'.$this->getAttr( $value['attr'] ).'>'.$val.'</textarea>';
 			}
+			elseif( $value['attr']['type']==="checkbox" || $value['attr']['type']==='radio' ){
+
+				if( isset($value['items']) ){
+
+					$checked = isset( $value['checked'] ) ? $value['checked']: '';
+
+					$txt = '';
+					foreach ($value['items'] as $i => $val) {
+
+						if( is_array($val) ){
+							$is_checked = false;
+							$v = !empty($val['id']) ? $val['id']: $i;
+							$value['attr']['id'] = $id.'_'. strtolower($v);
+
+							$values = !empty($value['attr']['value']) ? $value['attr']['value']: array();
+							if( !is_array($values) ) $values = array($values);
+
+							$value['attr']['value'] = $v;
+
+							if( in_array($v, $values) ){
+								$is_checked = true;
+							}elseif( ($value['attr']['type']==="radio" && $checked == $v) || ($value['attr']['type']==="checkbox" && !empty($val['checked'])) ){
+								$is_checked = true;
+							}
+							
+							$txt .= '<label class="'.$value['attr']['type'].'" for="'.$value['attr']['id'].'"><input'.$this->getAttr( $value['attr'] ). ( $is_checked? ' checked':'' ). '><span>'.(!empty($val['name']) ? $val['name']: '').'</span></label>';
+						}
+						else{
+							$is_checked = false;
+
+							if( $value['attr']['type']==="checkbox" ){
+								$value['attr']['name'] = strtolower($val);
+								$value['attr']['id'] = strtolower($val);
+							}
+							else{
+								$value['attr']['id'] = $id.'_'. strtolower($val);
+								$value['attr']['value'] = $val;
+
+								if( is_array($value['value']) ){
+
+								}
+								else if( $val==$checked ){
+									$is_checked = true;
+								}
+
+							}
+							
+							$txt .= '<label class="'.$value['attr']['type'].'" for="'.$value['attr']['id'].'"><input'.$this->getAttr( $value['attr'] ). ($is_checked? ' checked':'' ).'><span>'.$val.'</span></label>';
+						}
+					}
+
+					$string = $txt;
+				}
+				else{
+
+				}
+			}
 			else{
 				$string = '<input'.$this->getAttr( $value['attr'] ).'>';
 			}
 
+			$cls = 'control-group';
 			$error = '';
 			if( !empty($value['notify']) ){
-				$error = ' has-error';
+				$cls .= !empty($cls)? ' ':'';
+				$cls .= 'has-error';
 			}
 
 			$sidetip = '';
@@ -307,10 +391,23 @@ class Create_Form
 				$sidetip = '<div class="sidetip">'.$ps.'</div>';
 			}
 
-			$field_str.='<fieldset'.$fieldId.' class="control-group'.$error.'">'.
+			# hind
+			$hind = '';
+			if( !empty($value['hind']) ){
+
+				$cls .= !empty($cls)? ' ':'';
+				$cls .= 'has-hind';
+
+				$hind = '<div class="hind">'.$value['hind'].'</div>';
+			}
+
+			$cls = !empty($cls)? ' class="'.$cls.'"':'';
+			$field_str.='<fieldset'.$fieldId.$cls.'>'.
 				
 				$label.
 
+				$hind.
+				
 				'<div class="controls">'.
 					$string.
 					$sidetip.

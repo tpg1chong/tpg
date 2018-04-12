@@ -3,12 +3,12 @@
 class Val {
 
     public function minlength($data, $arg) {
-        if (strlen($data) < $arg)
+        if (mb_strlen($data) < $arg)
             return "ต้องมีความยาวอย่างน้อย $arg ตัวอักษร";
     }
 
     public function maxlength($data, $arg) {
-        if (strlen($data) > $arg)
+        if (mb_strlen($data) > $arg)
             return "ต้องมีความยาวไม่เกิน $arg ตัวอักษร";
     }
     
@@ -22,7 +22,7 @@ class Val {
     // ช่องนี้เว้นว่างไว้ไม่ได้
     public function is_empty($data) {
         if (empty($data))
-            return 'Please input Data'; //"ช่องนี้เว้นว่างไว้ไม่ได้";
+            return "ช่องนี้เว้นว่างไว้ไม่ได้";
     }
 
     public function space($text) {
@@ -60,12 +60,16 @@ class Val {
         else if(strlen($text) > $maxlength){
             return "ชื่อผู้ใช้ไม่ถูกต้อง! ต้องมีความยาวน้อยกว่า {$maxlength} ตัวอักษร";
         }
-        else if (!@ereg("^[[:alnum:]]([a-zA-Z0-9/.?]{3,14})$", $text)){
+        /*else if (!@ereg("^[[:alnum:]]([a-zA-Z0-9/.?]{3,14})$", $text)){
             return 'เว้นว่างไม่ได้ ต้องเป็นตัวอักษรภาษาอังกฤษและตัวเลขอารบิกเท่านั้น';
+        }*/
+
+        elseif( !preg_match('/^[A-Za-z]{1}[A-Za-z0-9]{4,15}$/', $text) ){
+            return 'เว้นว่างไม่ได้ และต้องเป็นตัวอักษรภาษาอังกฤษและตัวเลขอารบิกเท่านั้น';
         }
     }
 
-    public function name($string){
+    /*public function name($string){
 
         // "^[ก-๙]+[[:space:]]{1}[ก-๙]+$"
         if (!@ereg("[a-zA-Zก-เ]+$", $string)){
@@ -74,7 +78,7 @@ class Val {
         elseif( preg_match('[\'\/~`\!@#\$%\^&\*\(\)_\-\+=\{\}\[\]\|;:"\<\>,\.\?\\\]', $string) ){
             return 'ไม่สามารถใส่ตัวอักษรพิเศษลงในชื่อได้';
         }
-    }
+    }*/
 
     public function password($data, $arg = 6){
         if (strlen($data) < $arg) return "รหัสผ่านต้องมีความยาว $arg ตัวขึ้นไป";

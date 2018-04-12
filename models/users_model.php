@@ -7,26 +7,37 @@ class Users_Model extends Model{
     }
 
     private $_objType = "users";
-    private $_table = "users u LEFT JOIN users_role r ON u.user_role_id=r.role_id";
+    private $_table = "users u LEFT JOIN users_roles r ON u.user_role_id=r.role_id";
     private $_field = "
-          u.iduser as id
-        , firstname
-        , lastname
+          user_id
+        , user_name
         , user_email
+        , user_login
+        , user_lang
+        , user_is_owner
+
+        , user_mode
+        , user_lastvisit
+        , user_enabled
+
+        , role_id
+        , role_name
     ";
-    private $_cutNamefield = "user_";
+    private $_prefixField = "user_";
 
     public function is_user($text){
         $c = $this->db->count('users', "(user_login=:txt AND user_login!='') OR (user_email=:txt AND user_email!='')", array(':txt'=>$text));
-        
+
         return $c;
     }
     public function is_name($text) {
         return $this->db->count($this->_objType, "name='{$text}'");
     }
 
+
+    /* -- actions -- */
     public function insert(&$data) {
-        
+
         $data["{$this->_cutNamefield}created"] = date('c');
         $data["{$this->_cutNamefield}updated"] = date('c');
 
@@ -47,56 +58,59 @@ class Users_Model extends Model{
         $this->db->delete($this->_objType, "{$this->_cutNamefield}id={$id}");
     }
 
-    public function get($id){
-        $sth = $this->db->prepare("SELECT {$this->_field} FROM {$this->_table} WHERE iduser=:id LIMIT 1");
+
+    /* -- find -- */
+    public function findById($id){
+        $sth = $this->db->prepare("SELECT {$this->_field} FROM {$this->_table} WHERE user_id=:id LIMIT 1");
         $sth->execute( array( ':id' => $id  ) );
         return $sth->rowCount()==1 ? $this->convert( $sth->fetch( PDO::FETCH_ASSOC ) ): array();
     }
-
-    public function lists( $options=array() ) {
+    public function find( $options=array() ) {
 
         $options = array_merge(array(
             'pager' => isset($_REQUEST['pager'])? $_REQUEST['pager']:1,
             'limit' => isset($_REQUEST['limit'])? $_REQUEST['limit']:50,
             'more' => true,
 
-            'sort' => isset($_REQUEST['sort'])? $_REQUEST['sort']: 'created',
+            'sort' => isset($_REQUEST['sort'])? $_REQUEST['sort']: 'lastvisit',
             'dir' => isset($_REQUEST['dir'])? $_REQUEST['dir']: 'DESC',
-            
+
             'time'=> isset($_REQUEST['time'])? $_REQUEST['time']:time(),
-            
-            'q' => isset($_REQUEST['q'])? $_REQUEST['q']:null,
+
+            // 'enabled' => isset($_REQUEST['enabled'])? $_REQUEST['enabled']:1,
 
         ), $options);
 
         $date = date('Y-m-d H:i:s', $options['time']);
 
-        
-        $where_str = "";
-        $where_arr = array();
+        $condition = "";
+        $params = array();
 
-        if( !empty($options['company']) ){
-            $this->_table .= ' LEFT JOIN users_company c ON u.user_id=c.user_id';
-            $where_str .= !empty( $where_str ) ? " AND ":'';
-            $where_str .= "c.co_id=:company";
-            $where_arr[':company'] = $options['company'];
+
+        if( !empty($options['role']) ){
+            $condition .= "role=:role";
+            $params[':role'] = $options['role'];
         }
 
-        //print_r($this->_table);die;
+        $arr['total'] = $this->db->count($this->_table, $condition, $params);
 
-        $arr['total'] = $this->db->count($this->_table, $where_str, $where_arr);
+        $limit = !empty($options['unlimit']) ? '': $this->limited( $options['limit'], $options['pager'] );
+        $orderby = $this->orderby( $this->_prefixField.$options['sort'], $options['dir'] );
+        $where = !empty($condition) ? "WHERE {$condition}":'';
+        $sql = "SELECT {$this->_field} FROM {$this->_table} {$where} {$orderby} {$limit}";
+        // echo $sql; die;
 
-        $limit = $this->limited( $options['limit'], $options['pager'] );
-        $orderby = $this->orderby( $this->_cutNamefield.$options['sort'], $options['dir'] );
-        $where_str = !empty($where_str) ? "WHERE {$where_str}":'';
-        $arr['lists'] = $this->buildFrag( $this->db->select("SELECT {$this->_field} FROM {$this->_table} {$where_str} {$orderby} {$limit}", $where_arr ) );
+        $arr['lists'] = $this->buildFrag( $this->db->select($sql, $params ), $options );
 
         if( ($options['pager']*$options['limit']) >= $arr['total'] ) $options['more'] = false;
         $arr['options'] = $options;
 
         return $arr;
     }
-    public function buildFrag($results) {
+
+
+    /* -- convert data -- */
+    public function buildFrag($results, $options=array()) {
         $data = array();
         foreach ($results as $key => $value) {
             if( empty($value) ) continue;
@@ -105,22 +119,14 @@ class Users_Model extends Model{
 
         return $data;
     }
-    
     public function convert($data){
 
-        $data['fullname'] = "{$data['firstname']} {$data['lastname']}";
-
-        // $data = $this->_cutFirstFieldName($this->_cutNamefield, $data);
-        // $data['access'] = $this->setAccess($data['role_id']);    
-
-        // $data['initials'] = $this->fn->q('text')->initials( $data['name'] );
-        // $data['permit']['del'] = !empty($data['is_owner']) ? false: true;
+        $data = $this->__cutPrefixField($this->_prefixField, $data);
+        $data['access'] = $this->setAccess( $data['role_id'] );
 
         return $data;
     }
-
-    public function setAccess($id) 
-    {
+    public function setAccess($id)  {
         $access = array();
         if( $id == 1 ){
             $access = array(1);
@@ -133,7 +139,7 @@ class Users_Model extends Model{
     /* -- Login -- */
     public function login($user, $pess){
 
-        $sth = $this->db->prepare("SELECT iduser as id FROM {$this->_objType} WHERE (user_login=:login AND user_pass=:pass) OR (user_email=:login AND user_pass=:pass)");
+        $sth = $this->db->prepare("SELECT user_id as id FROM {$this->_objType} WHERE (user_login=:login AND user_pass=:pass) OR (user_email=:login AND user_pass=:pass)");
 
         $sth->execute( array(
             ':login' => $user,
@@ -153,11 +159,10 @@ class Users_Model extends Model{
         return $sth->rowCount()==1 ? $fdata['id']: false;
     }
 
-    /**/
-    /* roles */
-    /**/
-    public function roles($type='') {
-        return $this->db->select("SELECT role_id as id, role_name as name FROM users_roles");
+
+    /* -- admin roles -- */
+    public function admin_roles() {
+        return $this->db->select("SELECT role_id as id, role_name as name, role_display as display FROM users_roles ORDER BY role_name");
     }
 
 }

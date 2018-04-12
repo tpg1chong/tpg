@@ -58,14 +58,6 @@ $title = $this->getPage('title');
 $name = $this->getPage('name');
 $image = $this->getPage('image');
 
-
-$google = new Google();
-$client = $google->client;
-
-$client->setRedirectUri( URL . 'auth/google_oauth2/');
-$client->setScopes( $google->_scopes );
-
-
 // auth/google_oauth2
 /*if( !$auth->isLoggedIn() ){
     echo 1; 
@@ -80,27 +72,12 @@ else{
 <div class="section">
     <div class="content-wrapper<?=!empty($this->captcha)? ' has-captcha':''?>">
 
-        <div class="login-header-bar login-logo">
-            <div class="text">
-                <?php if( !empty($image) ){ ?><div class="pic"><img src="<?=$image?>"></div><?php } ?>
-                <h2><?= !empty( $title ) ? $title :''?></h2>
-            </div>
-
-            <div class="subtext mvm"></div>
-
-            
-        </div>
         <!-- end: login-header -->
 
         <div class="login-container-wrapper auth-box">
             <div class="login-container">
                 <div class="login-title"><span class="fwb">Sign in to your account</span></div>
                 
-
-                <a id="google-signin" class="btn btn-blue btn-large btn-block" href="<?=$client->createAuthUrl()?>"><span>Sign in with Google</span></a>
-
-                <div class="or_separator"><div class="line"></div><span>or</span><div class="line"></div></div>
-
                 <?=$form->html()?>
             </div>
 
@@ -109,7 +86,7 @@ else{
 
         <div class="login-footer-text">
             <!-- <a href="<?=URL?>"><i class="icon-home mrs"></i><span>Back To Home</span></a><span class="mhm">·</span> -->
-            <a href="<?=URL?>forgot_password" class="forgot_password"><span>Forgot password?</span></a>
+            <a href="<?=URL?>admin/forgot_password" class="forgot_password"><span>Forgot password?</span></a>
         </div>
         <!-- end: login-footer -->
         
