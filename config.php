@@ -3,7 +3,9 @@
 date_default_timezone_set("Asia/Bangkok");
 
 // Always provide a TRAILING SLASH (/) AFTER A PATH
-define('URL', 'http://localhost/tpg/');
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
+$pathName = '/tpg/';
+define('URL', $protocol.'://'.$_SERVER['HTTP_HOST'].$pathName);
 
 define('DB_TYPE', 'mysql');
 define('DB_HOST', 'localhost');
