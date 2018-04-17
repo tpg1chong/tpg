@@ -71,7 +71,7 @@ else{
 echo '<div class="navigation-main-bg navigation-trigger"></div>';
 echo '<nav class="navigation-main" role="navigation"><a class="navigation-btn-trigger navigation-trigger"><span></span></a>';
 
-echo '<div class="navigation-main-header"><div class="anchor clearfix">'.$image.'<div class="content"><div class="spacer"></div><div class="massages"><div class="fullname">'.$this->me['name'].'</div><div class="subname">'.$this->me['role_name'].'</div></div></div></div></div>';
+echo '<div class="navigation-main-header"><div class="anchor clearfix">'.$image.'<div class="content"><div class="spacer"></div><div class="massages"><div class="fullname">'.$this->me['name'].'</div><div class="subname"></div></div></div></div></div>';
 
 echo '<div class="navigation-main-content">';
 
