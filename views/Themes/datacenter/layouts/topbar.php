@@ -51,9 +51,7 @@ $pageNavR .= '<li class="lbtn">'.
 
 $pageNavR .= '<li class="divider"></li>';
 
-$pageNavR .= '<li>'.
-	'<a class="pageNavLabel"><i class="icon-bell-o"></i></a>'.
-'</li>';
+// $pageNavR .= '<li><a class="pageNavLabel"><i class="icon-bell-o"></i></a></li>';
 
 
 $imageAvatar = '';
