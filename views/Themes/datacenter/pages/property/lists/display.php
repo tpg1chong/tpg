@@ -22,14 +22,38 @@
 			
 		</div>
 		<div id="searchPage-RightColumn" class="searchPage-RightColumn">
-			
-			<div class="property-items" style="padding-left: 30px;">
-				<div ref="listsbox">
-					<?php for ($i=0; $i < 10; $i++) { ?>
-					<?php } ?>
-				</div>
 
-				<div class="property-items_alert">
+			<div style="padding-left: 30px;padding-top: 24px;padding-bottom: 24px;">
+
+				<table>
+					<tbody>
+						<tr>
+							<td><div>Total results: 2,551 properties found</div></td>
+							<td></td>
+							<td style="white-space: nowrap;width: 50px;background-color: #ccc;border: 1px solid #ccc;padding: 0 6px">Sort by:</td>
+							<td style="white-space: nowrap;width: 100px;border: 1px solid #ccc;background-color: #fff">
+								<div class="sort-bar clearfix">
+									<button type="button" class="sort-bar__item active" data-action="sort" data-value="property.updatedate DESC"><div class="sort-bar__inner"><span>Last update</span></div></button>
+									<button type="button" class="sort-bar__item" data-action="sort" data-value="state ASC,property.updatedate DESC"><div class="sort-bar__inner"><span>Available</span></div></button>
+									<button type="button" class="sort-bar__item" data-action="sort" data-value="state ASC,property.price DESC"><div class="sort-bar__inner"><span>Price</span></div></button>
+									<button type="button" class="sort-bar__item" data-action="sort" data-value="type.name ASC,state ASC,property.updatedate DESC"><div class="sort-bar__inner"><span>Type</span></div></button>
+									<button type="button" class="sort-bar__item" data-action="sort" data-value="zone.name ASC,state ASC,property.updatedate DESC"><div class="sort-bar__inner"><span>Zone</span></div></button>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				
+
+				<div class="property-items has-loading">
+					<div class="property-lists" ref="listsbox">
+						<?php for ($i=0; $i < 10; $i++) { ?>
+						<?php include 'incs/list-item.php'; ?>
+
+						<?php } ?>
+					</div>
+
+					
 					<div class="property-items_alert-loader">Loading...</div>
 				</div>
 			</div>
@@ -131,6 +155,23 @@
 		}
 	});
 
+
+	var $filterBedroomSlider = $('#filterBedroomSlider');
+
+    $filterBedroomSlider.rangeSlider({
+        type:"double",
+        grid: true,
+        grid_num: 7,
+        min: 1,
+        max: 8,
+
+        from: 1,
+        to: 3,
+
+        hide_min_max: true,
+        hide_from_to: true,
+    });
+
 	// Client ID and API key from the Developer Console
 	/*var APP_ID = '<YOUR_USER_ID>';
 	var options = {};
@@ -163,6 +204,19 @@
 	}*/
 
 	// Load the SDK asynchronously
+
+	$('.searchbox__advance-trigger-text').click(function() {
+
+		var $outer = $('.searchbox__outer'),
+			is = $outer.hasClass('has-advance');
+
+		$outer.toggleClass('has-advance', !is);
+		
+		$('.searchbox__advance-wrap').css({
+			height: is ? 0: $(window).height() - ( $outer.outerHeight() + $outer.offset().top + 50 ),
+			overflowY: is ? 'hidden': 'auto'
+		});
+	});
 
 </script>
 

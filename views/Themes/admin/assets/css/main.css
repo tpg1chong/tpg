@@ -23,6 +23,8 @@ h1, h2, h3 {
 h1 {font-size: 150%}
 h2 {font-size: 120%}
 h3 {font-size: 110%}
+
+
 input[type="checkbox"]:disabled+label {
     color: #c6c6c6;
 }
@@ -1152,7 +1154,6 @@ body.is-pushed-left .navigation-btn-trigger span {
     position: absolute;
     top: 0;
     height: 60px;
-    color: #fff
 }
 .navigation-main-header a{
     color: #fff

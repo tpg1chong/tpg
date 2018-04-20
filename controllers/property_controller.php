@@ -728,4 +728,13 @@ class Property_Controller extends Controller {
 
 
 
+
+    /* -- Contacts -- */
+    public function contacts()
+    {
+        
+        $this->view->render('property/contacts/lists/display');
+    }
+
+
 }
