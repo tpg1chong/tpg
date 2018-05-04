@@ -78,18 +78,20 @@ class Theme extends View{
             }
         }
 
+        
+
         $mode = 'light';
         if( !empty($this->me['mode']) ){
 
             switch ($this->me['mode']) {
-                case 'dark': $mode = 'drak'; break;
+                case 'dark': $mode = 'dark'; break;
                 case 'blue': $mode = 'blue'; break;
                 case 'green': $mode = 'green'; break;
             }
         }
+
         $this->elem('body')->addClass( $mode );
 
-        
         if( !empty($this->options['topbar']) ){
             $this->elem('body')->addClass( 'hasTopbar' );
         }

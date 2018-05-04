@@ -1,5 +1,5 @@
 <?php require_once "incs/init.php"; ?>
-<div id="mainContainer" class="Setting clearfix" data-plugins="main">
+<div id="mainContainer" class="Setting clearfix container" data-plugins="main">
 
 	<?php 
 

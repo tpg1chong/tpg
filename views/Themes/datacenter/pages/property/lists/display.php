@@ -1,14 +1,34 @@
-<div id="searchPage">
+<div id="searchPage" class="search__has-listCol">
 
 	<div class="search-box__container">
 		<div class="container">
-			<div class="search-box__wrap clearfix ">
-				<div class="search-box__item filter-keyword">
-					<lable class="filter-keyword-icon" for="keyword"><i class="icon-search"></i></lable>
-					<input id="keyword" class="input inputtext input-search" type="text" name="keyword" placeholder="Search Keyword?" maxlength="128" autocomplete="off" autofocus>
+			<div class="search-box__outer">
+				<div class="search-box__wrap clearfix ">
+					<div class="search-box__item filter-keyword">
+						<lable class="filter-keyword-icon" for="keyword"><i class="icon-search"></i></lable>
+						<input id="keyword" class="input inputtext input-search" type="text" name="keyword" placeholder="Search Keyword?" maxlength="128" autocomplete="off" autofocus>
+					</div>
+					<div class="search-box__item divider"></div>
+					<div class="search-box__item filter-action"><button class="input btn btn-orange btn-submit">Search</button></div>
 				</div>
-				<div class="search-box__item divider"></div>
-				<div class="search-box__item filter-action"><button class="input btn btn-orange btn-submit">Search</button></div>
+
+				
+				<table>
+					<tbody>
+						<tr>
+							<td><div><strong>Total results:</strong> <span class="fcblue">2,551</span> <span>properties found</span></div></td>
+							<td></td>
+							<td style="white-space: nowrap;width: 50px;padding: 0 6px;font-weight: bold;font-size: 11px;">Sort by:</td>
+							<td style="white-space: nowrap;width: 100px;border: 1px solid #ccc;background-color: #fff">
+								<div class="sort-bar clearfix">
+									<button type="button" class="sort-bar__item active" data-action="sort" data-value="property.updatedate DESC"><div class="sort-bar__inner"><span>Last update</span></div></button><button type="button" class="sort-bar__item" data-action="sort" data-value="state ASC,property.updatedate DESC"><div class="sort-bar__inner"><span>Available</span></div></button><button type="button" class="sort-bar__item" data-action="sort" data-value="state ASC,property.price DESC"><div class="sort-bar__inner"><span>Price</span></div></button><button type="button" class="sort-bar__item" data-action="sort" data-value="type.name ASC,state ASC,property.updatedate DESC"><div class="sort-bar__inner"><span>Type</span></div></button><button type="button" class="sort-bar__item" data-action="sort" data-value="zone.name ASC,state ASC,property.updatedate DESC"><div class="sort-bar__inner"><span>Zone</span></div></button>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				
+
 			</div>
 		</div>
 	</div>
@@ -25,26 +45,6 @@
 
 			<div style="padding-left: 30px;padding-top: 24px;padding-bottom: 24px;">
 
-				<table>
-					<tbody>
-						<tr>
-							<td><div>Total results: 2,551 properties found</div></td>
-							<td></td>
-							<td style="white-space: nowrap;width: 50px;background-color: #ccc;border: 1px solid #ccc;padding: 0 6px">Sort by:</td>
-							<td style="white-space: nowrap;width: 100px;border: 1px solid #ccc;background-color: #fff">
-								<div class="sort-bar clearfix">
-									<button type="button" class="sort-bar__item active" data-action="sort" data-value="property.updatedate DESC"><div class="sort-bar__inner"><span>Last update</span></div></button>
-									<button type="button" class="sort-bar__item" data-action="sort" data-value="state ASC,property.updatedate DESC"><div class="sort-bar__inner"><span>Available</span></div></button>
-									<button type="button" class="sort-bar__item" data-action="sort" data-value="state ASC,property.price DESC"><div class="sort-bar__inner"><span>Price</span></div></button>
-									<button type="button" class="sort-bar__item" data-action="sort" data-value="type.name ASC,state ASC,property.updatedate DESC"><div class="sort-bar__inner"><span>Type</span></div></button>
-									<button type="button" class="sort-bar__item" data-action="sort" data-value="zone.name ASC,state ASC,property.updatedate DESC"><div class="sort-bar__inner"><span>Zone</span></div></button>
-								</div>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-				
-
 				<div class="property-items has-loading">
 					<div class="property-lists" ref="listsbox">
 						<?php for ($i=0; $i < 10; $i++) { ?>
@@ -59,8 +59,8 @@
 			</div>
 		</div>
 	</div>
-
 </div>
+
 
 <script type="text/javascript" src="<?=JS?>plugins/rangeSlider.js"></script>
 <script type="text/javascript">
@@ -71,8 +71,15 @@
 	$('#searchPage').css({
 		paddingTop: $('.search-box__container').outerHeight()
 	});
+
+	var LeftColumnTop = $('#filter-topbar').outerHeight() + $('#header-primary').outerHeight();
+
+	if( !$('#searchPage').hasClass('search__has-listCol') ){
+		LeftColumnTop += $('.search-box__container').outerHeight();
+	}
+
 	$LeftColumn.css({
-		top: $('.search-box__container').outerHeight() + $('#filter-topbar').outerHeight() + $('#header-primary').outerHeight(),
+		top: LeftColumnTop,
 	});
 
 

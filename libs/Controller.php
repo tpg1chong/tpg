@@ -93,6 +93,8 @@ class Controller {
             /* -- authorization -- */
             $this->pageOptions['auth'] = $this->model->query('system')->auth( !empty($this->me['access']) ? $this->me['access']: array() );
             $this->view->setPage('auth', $this->pageOptions['auth']);
+
+
         }
         else if( !empty( $loggedOn ) ) {
             $this->login();
@@ -226,6 +228,7 @@ class Controller {
     /* -- init --*/
     public function init($on) {
 
+
         // Get Data System
         $this->pageOptions = array_merge($this->pageOptions, $this->model->query('system')->get() );
         $this->pageOptions['on'] = $on;
@@ -237,8 +240,9 @@ class Controller {
         if( empty($this->pageOptions['theme']) ){
 
             $this->pageOptions['theme'] = 'datacenter';
-            $this->pageOptions['theme_options'] = array('topbar'=>true);
-            $this->pageOptions['favicon'] = IMAGES.'favicon-v2.png';
+            $this->pageOptions['theme_options'] = array('topbar'=>true, 'footer'=>true);
+            $this->pageOptions['favicon'] = IMAGES.'tpg-favicon.ico';
+            $this->pageOptions['image_logo_url'] = IMAGES.'tpg-logo.svg';
             $this->pageOptions['loggedOn'] = true;
         }
 
@@ -248,11 +252,16 @@ class Controller {
 
     public function setDataDefault()
     {
+
         $themeName = $this->view->getPage( 'theme' );
         
         if( $themeName=='datacenter' ){
 
-            $this->view->setPage('nav', $this->model->query('system')->pageNav());
+            $this->view->setPage('nav', $this->model->query('system')->pageNav() );
+        }
+
+        if( !empty($this->me) ){
+            
         }
     }
 

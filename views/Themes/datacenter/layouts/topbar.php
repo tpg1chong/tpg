@@ -45,8 +45,56 @@ $pageNavR = '';
 	'</div>'.
 '</li>';*/
 
-$pageNavR .= '<li class="lbtn">'.
+$a = '';
+for ($i=0; $i < 20; $i++) { 
+	$a .= '<li class="menu-item"><a class="anchor clearfix">'.
+		'<div class="avatar lfloat no-avatar mrm"><div class="initials">'.$i.'</div></div>'.
+		'<div class="rfloat mlm">'.
+			'<span class="group-btn">'.
+				'<button type="button" class="btn btn-small"><span class="fwn">Staff</span></button>'.
+				'<button type="button" class="btn btn-small"><span class="fwn">Client</span></button>'.
+			'</span>'.
+		'</div>'.
+		'<div class="content"><div class="spacer"></div><div class="massages">'.
+			'<div class="fullname">K.Anna Wadenholm</div>'.
+			'<div class="subname"><span>#21369</span> · <span><i class="icon-clock-o"></i> 20, May 2018 - Aun</span></div>'.
+		'</div></div>'.
+	'</a></li>';
+}
+
+$pageNavR .= '<li class="propertyListingToggler" data-plugins="propertyListingToggler">'.
 	'<a class="pageNavLabel"><i class="icon-file-text-o mrs"></i>Property Listing</a>'.
+
+	'<div class="uiToggleFlyout uiToggleFlyoutRight" id="propertyListingFlyout">'.
+
+		'<div class="propertyListingMenu">'.
+
+			'<div role="search"><form class="t1-form form-search js-search-form" action="/search" id="global-nav-search">
+			    <label class="visuallyhidden" for="search-query">Search query</label>
+			    <input class="search-input" type="text" id="search-query" placeholder="Search property listing by code" name="q" autocomplete="off">
+			    <span class="search-icon js-search-action">
+			      <button type="submit" class="icon icon-search" tabindex="0">
+			        <span class="visuallyhidden">Search</span>
+			      </button>
+			    </span>
+
+			</form></div>'.
+
+			'<div class="propertyListingMenu__content">'.
+				'<ul role="menu">'.
+
+					'<li class="menu-item head">Today</li>'.
+					$a.
+				'</ul>'.
+
+				'<div class="propertyListingFooter">Loading...</div>'.
+		    '</div>'.
+		    // 
+
+    	'</div>'.
+
+    '</div>'.
+
 '</li>';
 
 $pageNavR .= '<li class="divider"></li>';
@@ -69,17 +117,17 @@ $pageNavR .= '<li class="uiToggle headerAvatarWrap">'.
 
     '<div class="uiToggleFlyout uiToggleFlyoutRight uiToggleFlyoutPointer" id="accountSettingsFlyout"><ul role="menu" class="uiMenu">'.
 
-            '<li class="menuItem head"><a class="itemAnchor" href="#"><span class="itemLabel"><div class="clearfix"><div class="anchor"><div class="clearfix">'.$imageAvatarBig.'<div class="content"><div class="spacer"></div><div class="massages"><div class="fullname">'.$this->me['name'].'</div></div></div></div></div></div></span></a></li>'.
+        '<li class="menuItem head"><a class="itemAnchor" href="#"><span class="itemLabel"><div class="clearfix"><div class="anchor"><div class="clearfix">'.$imageAvatarBig.'<div class="content"><div class="spacer"></div><div class="massages"><div class="fullname">'.$this->me['name'].'</div></div></div></div></div></div></span></a></li>'.
 
-            /*<li class="menuItemDivider" role="separator"></li>
-            <li class="menuItem"><a class="itemAnchor" href="http://localhost/events/manage/index.php"><span class="itemLabel">จัดการระบบ</span></a></li>*/
+        /*<li class="menuItemDivider" role="separator"></li>
+        <li class="menuItem"><a class="itemAnchor" href="http://localhost/events/manage/index.php"><span class="itemLabel">จัดการระบบ</span></a></li>*/
 
-            '<li class="menuItemDivider" role="separator"></li>'.
-            
-            '<li class="menuItem"><a class="itemAnchor" href="'.URL.'settings"><span class="itemLabel">'.Translate::Val('Settings').'</span></a></li>'.
+        '<li class="menuItemDivider" role="separator"></li>'.
+        
+        '<li class="menuItem"><a class="itemAnchor" href="'.URL.'settings"><span class="itemLabel">'.Translate::Val('Settings').'</span></a></li>'.
 
-            '<li class="menuItem"><a class="itemAnchor" data-plugins="dialog" href="'.URL.'logout/admin"><span class="itemLabel">'.Translate::Val('Log Out').'</span></a></li>'.
-        '</ul></div>'.
+        '<li class="menuItem"><a class="itemAnchor" data-plugins="dialog" href="'.URL.'logout/admin"><span class="itemLabel">'.Translate::Val('Log Out').'</span></a></li>'.
+    '</ul></div>'.
 
 '</li>';
 

@@ -25,6 +25,8 @@ require_once 'Property/Room_Offers.php';
 require_once 'Property/Room_Photo.php';
 
 
+require_once 'Property/Listing.php';
+
 class Property_Model extends Model{
 
     public function __construct() {
@@ -54,6 +56,9 @@ class Property_Model extends Model{
 
         # Photo
         $this->photo = new Room_Photo();
+
+
+        $this->listing = new Property_Listing();
     }
 
 }

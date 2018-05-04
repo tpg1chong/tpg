@@ -737,4 +737,12 @@ class Property_Controller extends Controller {
     }
 
 
+
+    public function listingList()
+    {
+        // $results = $this->model->listing->find();
+
+        echo json_encode($this->model->listing->find());
+    }
+
 }

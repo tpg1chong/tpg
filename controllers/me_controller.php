@@ -1,6 +1,6 @@
 <?php
 
-class Accounts_Controller extends Controller {
+class Me_Controller extends Controller {
 
     function __construct() {
         parent::__construct();
@@ -28,6 +28,12 @@ class Accounts_Controller extends Controller {
 
     public function update($name='', $value='')
     {
-        
+        $name = !empty($_REQUEST['name']) ? $_REQUEST['name']: $name;
+        $value = !empty($_REQUEST['value']) ? $_REQUEST['value']: $value;
+
+        $post[$name] = trim($value);
+        $this->model->query('users')->update( $this->me['id'], $post );
+
+        echo json_encode(array('log'=> array('text'=>'update'), 'post'=>$post));
     }
 }

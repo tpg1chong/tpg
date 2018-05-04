@@ -63,7 +63,7 @@ class System_Model extends Model{
             $arr['member_manager'] = array('view'=>1,'edit'=>1, 'del'=>1, 'add'=>1);
             $arr['inbox'] = array('view'=>1,'edit'=>1, 'del'=>1, 'add'=>1);
 
-
+            
             # property
             $arr['property_manager'] = array('view'=>1,'edit'=>1, 'del'=>1, 'add'=>1);
             $arr['property_type'] = array('view'=>1,'edit'=>1, 'del'=>1, 'add'=>1);

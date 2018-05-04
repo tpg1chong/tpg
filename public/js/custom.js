@@ -928,7 +928,7 @@ var PHP = {
 	}
 };
 var Config = {
-		uri: window.location.origin + '/place/',
+		uri: window.location.origin + '/tpg/',
 		plugins: {},
 	},
 	app = {

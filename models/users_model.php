@@ -14,6 +14,7 @@ class Users_Model extends Model{
         , firstname
         , lastname
         , user_email
+        , user_mode
         
         , role_id
     ";
@@ -32,24 +33,24 @@ class Users_Model extends Model{
     /* -- actions -- */
     public function insert(&$data) {
 
-        $data["{$this->_cutNamefield}created"] = date('c');
-        $data["{$this->_cutNamefield}updated"] = date('c');
+        $data["{$this->_prefixField}created"] = date('c');
+        $data["{$this->_prefixField}updated"] = date('c');
 
-        if( isset($data["{$this->_cutNamefield}pass"]) ){
-            $data["{$this->_cutNamefield}pass"] = Hash::create('sha256', $data["{$this->_cutNamefield}pass"], HASH_PASSWORD_KEY);
+        if( isset($data["{$this->_prefixField}pass"]) ){
+            $data["{$this->_prefixField}pass"] = Hash::create('sha256', $data["{$this->_prefixField}pass"], HASH_PASSWORD_KEY);
         }
 
         $this->db->insert($this->_objType, $data);
         $data['id'] = $this->db->lastInsertId();
 
-        $data = $this->cut($this->_cutNamefield, $data);
+        $data = $this->cut($this->_prefixField, $data);
     }
     public function update($id, $data) {
-        $data["{$this->_cutNamefield}updated"] = date('c');
-        $this->db->update($this->_table, $data, "{$this->_cutNamefield}id={$id}");
+        // $data["{$this->_prefixField}updated"] = date('c');
+        $this->db->update($this->_objType, $data, "iduser={$id}");
     }
     public function delete($id) {
-        $this->db->delete($this->_objType, "{$this->_cutNamefield}id={$id}");
+        $this->db->delete($this->_objType, "{$this->_prefixField}id={$id}");
     }
 
 
