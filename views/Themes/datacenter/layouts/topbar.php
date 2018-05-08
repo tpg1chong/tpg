@@ -45,25 +45,8 @@ $pageNavR = '';
 	'</div>'.
 '</li>';*/
 
-$a = '';
-for ($i=0; $i < 20; $i++) { 
-	$a .= '<li class="menu-item"><a class="anchor clearfix">'.
-		'<div class="avatar lfloat no-avatar mrm"><div class="initials">'.$i.'</div></div>'.
-		'<div class="rfloat mlm">'.
-			'<span class="group-btn">'.
-				'<button type="button" class="btn btn-small"><span class="fwn">Staff</span></button>'.
-				'<button type="button" class="btn btn-small"><span class="fwn">Client</span></button>'.
-			'</span>'.
-		'</div>'.
-		'<div class="content"><div class="spacer"></div><div class="massages">'.
-			'<div class="fullname">K.Anna Wadenholm</div>'.
-			'<div class="subname"><span>#21369</span> · <span><i class="icon-clock-o"></i> 20, May 2018 - Aun</span></div>'.
-		'</div></div>'.
-	'</a></li>';
-}
-
 $pageNavR .= '<li class="propertyListingToggler" data-plugins="propertyListingToggler">'.
-	'<a class="pageNavLabel"><i class="icon-file-text-o mrs"></i>Property Listing</a>'.
+	'<a class="pageNavLabel" role="toggle"><i class="icon-file-text-o mrs"></i>Property Listing</a>'.
 
 	'<div class="uiToggleFlyout uiToggleFlyoutRight" id="propertyListingFlyout">'.
 
@@ -81,13 +64,14 @@ $pageNavR .= '<li class="propertyListingToggler" data-plugins="propertyListingTo
 			</form></div>'.
 
 			'<div class="propertyListingMenu__content">'.
-				'<ul role="menu">'.
+				'<ul role="menu"></ul>'.
 
-					'<li class="menu-item head">Today</li>'.
-					$a.
-				'</ul>'.
+				'<div class="propertyListingFooter">'.
 
-				'<div class="propertyListingFooter">Loading...</div>'.
+					'<div class="propertyListingAlert_loader">Loading...</div>'.
+					'<div class="propertyListingAlert_empty">No results found.</div>'.
+					'<div class="propertyListingAlert_error">Error loading listing, <a type="button" data-action="tryagain">Try again</a></div>'.
+				'</div>'.
 		    '</div>'.
 		    // 
 

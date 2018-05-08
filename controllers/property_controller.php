@@ -740,9 +740,16 @@ class Property_Controller extends Controller {
 
     public function listingList()
     {
-        // $results = $this->model->listing->find();
 
-        echo json_encode($this->model->listing->find());
+        try {
+            // $results = $this->model->listing->find();
+            // sleep(10);
+            $arr = $this->model->listing->find();
+        } catch (Exception $e) {
+            $arr['error'] = 1;
+        }
+
+        echo json_encode( $arr );
     }
 
 }

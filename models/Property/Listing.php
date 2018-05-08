@@ -10,7 +10,12 @@ class Property_Listing extends Model
     }
 
 
-    private $_table = "listing LEFT JOIN users ON listing.idusercreate=users.iduser";
+    private $_table = "
+
+    listing 
+        LEFT JOIN users ON listing.idusercreate=users.iduser
+
+    ";
     private $_field = "
 
           listing.idlisting as id
@@ -40,9 +45,9 @@ class Property_Listing extends Model
     }
     public function find($options=array())
     {
-        foreach (array('enabled') as $key) {
+        foreach (array('enabled', 'q') as $key) {
             if( isset($_REQUEST[$key]) ){
-                $options[$key] = $_REQUEST[$key];
+                $options[$key] = trim($_REQUEST[$key]);
             }
         }
 
@@ -69,17 +74,16 @@ class Property_Listing extends Model
             $params[':enabled'] = $options['enabled'];
         }
 
-        if( isset($options['building']) ){
+        if( !empty($options['q']) ){
             $condition .= !empty($condition) ? ' AND ':'';
-            $condition .= "{$this->_prefixField}building_id=:building";
-            $params[':building'] = $options['building'];
+            $condition .= "(listing.idlisting=:id OR listing.name LIKE '%{$options['q']}' OR users.username='{$options['q']}')";
+            $params[':id'] = intval($options['q']);
+
+            // $params[':q'] = $options['q'];
+            // $condition .= "{$this->_prefixField}name LIKE '%{$options['q']}%'";
         }
 
-        if( isset($options['category']) ){
-            $condition .= !empty($condition) ? ' AND ':'';
-            $condition .= "{$this->_prefixField}category_id=:category";
-            $params[':category'] = $options['category'];
-        }
+
 
 
         $arr['total'] = $this->db->count($this->_table, $condition, $params);
@@ -115,6 +119,8 @@ class Property_Listing extends Model
         $data['code'] = sprintf("%05d",$data['id']);
         $data['created_str'] = $this->fn->q('time')->stamp( $data['createdate'] );
         $data['user_name'] = ucfirst( $data['username'] );
+
+        
 
         return $data;
     }

@@ -900,7 +900,7 @@ a.btn-edit:hover span {
     margin-bottom: 14px;
 }
 .property-item__title{
-    font-size: 14px;
+    font-weight: bold;
 }
 .property-item__code{
     font-size: 13px;
@@ -1016,6 +1016,10 @@ a.btn-edit:hover span {
     z-index: 0;
     padding: 10px;
     padding-left: 60px;
+    display: none;
+}
+.has__sideRightComment.property-item .property-item__sideRightComment{
+    display: block;
 }
 .property-item__sideRightComment .label{
     display: block;
@@ -1537,8 +1541,7 @@ body.dark .propertyListingToggler.openToggler .pageNavLabel{
     margin-bottom: -1px; 
 }
 .propertyListingFooter{
-    padding: 8px 12px;
-    text-align: center;
+    
 }
 .propertyListingList .code{
     border-radius: 0;
@@ -1550,4 +1553,153 @@ body.dark .propertyListingToggler.openToggler .pageNavLabel{
 }
 .propertyListingList .code:hover{
     text-decoration: none;
+}
+.propertyListingAlert_loader, .propertyListingAlert_empty, .propertyListingAlert_error{
+    display: none;
+    padding: 8px 12px;
+    text-align: center;
+    color: #777
+}
+
+.propertyListingAlert_empty, .propertyListingAlert_error{
+    padding: 24px;
+    color: #868686;
+    background: #fdd2d2;
+    text-shadow: 0 1px 0 rgba(255,255,255,.7)
+}
+
+.propertyListingMenu__content.has-loading .propertyListingAlert_loader, 
+.propertyListingMenu__content.has-error .propertyListingAlert_error, 
+.propertyListingMenu__content.has-empty .propertyListingAlert_empty{
+    display: block;
+}
+
+
+.propertyListingModel{
+    height:auto;left:0;min-height:100%;position:absolute;right:0;top:0;z-index:400;opacity:0;-webkit-transition:opacity 0.3s;-moz-transition:opacity 0.3s;transition:opacity 0.3s;
+
+    background-color:gray;
+    background-color:rgba(0,0,0,.4);
+    -ms-filter:"alpha(opacity=40)";
+    display: none;
+    pointer-events: none;
+
+}
+.propertyListingModel.active{
+    display: block;
+    pointer-events: auto;
+}
+
+.propertyListingModel.show{opacity:1}
+.propertyListingModel .model-container{
+    border-radius: 3px;
+    box-shadow: 0 2px 26px rgba(0, 0, 0, .3), 0 0 0 1px rgba(0, 0, 0, .1);
+    font-size: 18px;
+    margin: 36px auto;
+    max-width: 1200px;
+    min-width: 900px;
+    width: 90%;
+
+}
+.propertyListingModel .model-title{
+    font-size: 100%;
+    padding-top: 14px;
+}
+.propertyListingModel.show .model-container{opacity:1;-webkit-transform:translateX(0);-moz-transform:translateX(0);-ms-transform:translateX(0);transform:translateX(0)}
+
+.propertyListing-status{
+    padding: 4px 12px;
+    display: inline-block;
+    background-color: #eee;
+    border-radius: 2px;
+
+    background: #ea8e20;
+    background: -moz-linear-gradient(left,#ea8e20 0%,#efb36d 100%);
+    background: -webkit-gradient(linear,left top,right top,color-stop(0%,#ea8e20),color-stop(100%,#efb36d));
+    background: -webkit-linear-gradient(left,#ea8e20 0%,#efb36d 100%);
+    background: -o-linear-gradient(left,#ea8e20 0%,#efb36d 100%);
+    background: -ms-linear-gradient(left,#ea8e20 0%,#efb36d 100%);
+    background: linear-gradient(to right,#ea8e20 0%,#efb36d 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ea8e20',endColorstr='#efb36d',GradientType=1);
+
+    -webkit-box-shadow: inset 0 1px 0 rgba(85,111,165,.5), 0 1px 0 rgba(0,0,0,.15);
+    box-shadow: inset 0 1px 0 rgba(85,111,165,.5), 0 1px 0 rgba(0,0,0,.15);
+    -moz-box-shadow: 0px 2px 8px rgba(0,0,0,.1);
+    -webkit-box-shadow: 0px 2px 8px rgba(0,0,0,.1);
+    box-shadow: 0px 2px 8px rgba(0,0,0,.1);
+    /*color: #fff;*/
+    vertical-align: top;
+}
+.propertyListing-title{
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 16px;
+    vertical-align: top;
+}
+.propertyListing-title .desc{
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.propertyListing-tableSummary .label{
+    font-weight: bold;
+    color: #333;
+    font-size: 12px;
+    display: block;
+}
+.propertyListing-tableSummary .td-link-sharing{
+    width: 300px;
+    white-space: nowrap;
+}
+
+.link-sharing-input{
+    background-color: #fff;
+    width: 100%
+}
+.link-sharing-btn, .link-sharing-btn:before{
+    border-radius: 0 3px 3px 0; 
+}
+
+.propertyListingModel .model-summary{
+    font-size: 14px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.3);
+    position: relative;
+    z-index: 10;
+}
+.propertyListingModel .model-body{
+    background-color: #f2f2f2
+}
+.propertyListingModel .model-summary .label{
+    color: #555;
+    font-weight: bold;
+}
+.propertyListingModel .model-buttons{
+    box-shadow: 0 -1px 2px rgba(0,0,0,.3);
+}
+
+
+.propertyListingModel .model-body{
+    overflow-y: scroll;
+    height: 700px
+}
+.model-title{
+    position: relative;
+}
+.model-title-close{
+    top: 0;
+    background-color: rgba(0,0,0,.1);
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-size: 12px;
+    color: #fff;
+    border-radius: 0 0 2px 2px;
+    position: absolute;
+    right: 20px;
+
+    background-image: url(../images/cross-out.svg);
+    background-repeat: no-repeat;
+    background-size: 10px;
+    background-position: center;
 }
