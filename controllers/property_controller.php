@@ -740,11 +740,11 @@ class Property_Controller extends Controller {
 
     public function listingList()
     {
-
         try {
             // $results = $this->model->listing->find();
             // sleep(10);
             $arr = $this->model->listing->find();
+
         } catch (Exception $e) {
             $arr['error'] = 1;
         }
@@ -752,4 +752,52 @@ class Property_Controller extends Controller {
         echo json_encode( $arr );
     }
 
+
+    public function propertyList()
+    {
+
+        try {
+            
+            $items = array();
+
+            $buildingOptions = array('limit'=>10, 'view_stype'=>'bucketed');
+            $q = isset($_REQUEST['q']) ? $_REQUEST['q']: '';
+
+            if( strlen($q) > 3 ){
+                unset($buildingOptions['limit']);
+            }
+
+
+            $building = $this->model->building->find( $buildingOptions );
+            $items['building'] = $building['items'];
+
+            /*$property = $this->model->property->find( array('limit'=>4) );
+            $items['property'] = $property['items'];*/
+
+            $owner = $this->model->owner->find( array('limit'=>4, 'view_stype'=>'bucketed') );
+            $items['owner'] = $owner['items'];
+
+
+            $contact = $this->model->contact->find( array('limit'=>4, 'view_stype'=>'bucketed') );
+            $items['contact'] = $contact['items'];
+
+            $arr['items'] = $items;
+
+        } catch (Exception $e) {
+            $arr['error'] = 1;
+        }
+
+        // print_r($arr); die;
+        echo json_encode( $arr );
+    }
+
+    public function search()  {
+        
+
+        $results = $this->model->find();
+        // print_r($results); die;
+        
+        echo json_encode( $results );
+
+    }
 }

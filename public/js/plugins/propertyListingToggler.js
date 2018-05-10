@@ -285,8 +285,6 @@ if ( typeof Object.create !== 'function' ) {
 					}
 					
 					self.$menu.parent().toggleClass('has-more', self.getData.more);
-
-					// console.log( res );
 				});
 
 			}, length || 1);
