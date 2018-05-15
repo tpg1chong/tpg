@@ -214,7 +214,11 @@ function setElem__PropertyItem( data ) {
 	);
 
 
-	var $item = $('<div>', {class: 'property-item'}).addClass('state-'+data.state).append( $content );
+	var $item = $('<div>', {class: 'property-item', 'data-id': data.property_id }).addClass('state-'+data.state).append( $content );
+
+
+	$item.data( data );
+
 	return $item;
 }
 
