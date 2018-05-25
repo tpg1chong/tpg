@@ -134,8 +134,6 @@ if ( typeof Object.create !== 'function' ) {
 
 			
 		}
-
-
 	};
 
 	var PropertyListingToggler = {
