@@ -28,6 +28,5 @@ class Accounts_Controller extends Controller {
 
     public function update($name='', $value='')
     {
-        
     }
 }
